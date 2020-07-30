@@ -1,10 +1,10 @@
-//SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0 
 pragma solidity >= 0.5.0 < 0.7.0;
 
-import '../node_modules/@openzeppelin/contracts/utils/Strings.sol';
-import '../node_modules/@openzeppelin/contracts/access/Ownable.sol';
-import '../node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol';
-import './Organization.sol';
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/ReentrancyGuard.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
+
+import "./Organization.sol";
 
 contract Ticketer is Ownable {
     using SafeMath for uint256; 
@@ -84,6 +84,8 @@ contract Ticketer is Ownable {
         // require(!organizations[bytes(organizationName)].nameTaken, "Name is already taken");
         require(notExits(organizationName), "Name is already taken");
         uint256 _tokenAmount = msg.value.div(rate);
+        
+        // uint256 forGas  // TODO send 5% goes to the organization to cater for future gas price
 
         Organization newOrganization = new Organization(
             _tokenAmount,
@@ -96,14 +98,18 @@ contract Ticketer is Ownable {
             msg.sender
         );
         
+        
         registeredOrganizations.add(address(newOrganization));
         organizations[bytes(organizationName)].organizationOwner = msg.sender; 
         organizations[bytes(organizationName)].nameTaken = true; 
         organizations[bytes(organizationName)].organizationName = bytes(organizationName); 
         organizations[bytes(organizationName)].organizationEmail = bytes(organizationEmail);
         organizations[bytes(organizationName)].organizationAddress = address(newOrganization);
+        
         return (address(newOrganization), msg.sender);
     }
     
     fallback() external {}
 }
+
+

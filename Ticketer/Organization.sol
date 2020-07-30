@@ -1,11 +1,11 @@
-//SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0 
 pragma solidity >= 0.5.0 < 0.7.0;
 
-import '../node_modules/@openzeppelin/contracts/math/SafeMath.sol';
-import '../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import '../node_modules/@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol';
-import '../node_modules/@openzeppelin/contracts/utils/EnumerableSet.sol';
-import '../node_modules/@openzeppelin/contracts/utils/Strings.sol';
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/math/SafeMath.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20Burnable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/EnumerableSet.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Strings.sol";
 
 contract Organization is ERC20, ERC20Burnable {
     
@@ -57,7 +57,6 @@ contract Organization is ERC20, ERC20Burnable {
       address creator
      ) public payable ERC20(name, symbol) 
     {
-    // require(_ticketer == 0x018Fa7a4ff90437957F1b2184743f10774B1a433, "We are trying to run a business, please do it from Ticketer main app, thank you");
     _maximumBuy = initialSupply.div(3); // You can only buy a third of the total tokens, subject to change
     _owner = creator; // hand over ownership to the creator of the contract
     _initialSupply = initialSupply;
@@ -114,13 +113,17 @@ contract Organization is ERC20, ERC20Burnable {
    function setRate(uint256 _newRate, address _caller) external isControlPanel isOwner(_caller) returns(uint256, string memory) {
        _tokenRate = _newRate.mul(0.00000001 ether);
        return (_tokenRate, symbol());
-    }
+   }
    
 //   function setMaximumBuy(uint256 _newMaximumBuy, address _caller) external isControlPanel isOwner(_caller) returns(bool, uint256) {
 //       _maximumBuy = _newMaximumBuy;
 //       return (true, _maximumBuy);
 //   }
 
+    function transferTo(address to, uint256 amount, address _caller) callerIsAdmin(_caller) external returns(bool) {
+        transferFrom(_caller, to, amount);
+        return true;
+    }
    
    function getTokenRate() external view returns(uint256, uint256){
       require(_tokenRate > 0, "Admin is yet to set the rate for this tokens/tickets");
@@ -129,7 +132,7 @@ contract Organization is ERC20, ERC20Burnable {
    
    function getOrganizationDetail() external view returns(uint256, string memory, address, string memory) {
       return (totalSupply(), string(adminStruct[OWNER_EMAIL].email), address(this), symbol());
-  }
+   }
   
   function getTotalSupply()public view returns(uint){
       return totalSupply();
@@ -205,19 +208,6 @@ contract Organization is ERC20, ERC20Burnable {
   
   // Admin Logic -ENDS
   
-  
-  // Organization Functions - STARTS
-  
-//   function burnTokens(uint256 _amount, address _caller) isControlPanel callerIsAdmin(_caller) external returns(bool success){
-//         _burn(_caller, _amount);
-//         return true;
-//     }
-    
-//     function burnTokensIn(address _account, uint256 _amount, address _caller) isControlPanel() callerIsAdmin(_caller) external returns(bool success){
-//         burnFrom(_account, _amount);
-//         return true;
-//     }
-  
   function showOwnerDetails() external view returns(address ownerAddress, string memory ownerEmail){
       address _ownerAddress = adminStruct[OWNER_EMAIL].walletAddress;
       string memory _ownerEmail = string(adminStruct[OWNER_EMAIL].email);
@@ -233,6 +223,7 @@ contract Organization is ERC20, ERC20Burnable {
       return true;
   }
   // Organization Functions - ENDS
+  
   fallback() external {
       // I have no idea what to put here yet
       

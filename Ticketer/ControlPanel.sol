@@ -1,7 +1,7 @@
-//SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0 
 pragma solidity >= 0.5.0 < 0.7.0;
 
-import './Organization.sol';
+import 'Organization.sol';
 
 contract ControlPanel {
     
@@ -25,6 +25,10 @@ contract ControlPanel {
     function setRate(uint256 newRate) public returns(uint256 updatedRate, string memory symbol) {
         return organization.setRate(newRate, msg.sender);
     }
+    
+    // function setMaxBuy(uint256 maxBuy) public returns(bool success, uint256 updatedMaximumBuyAmount) {
+    //     return organization.setMaximumBuy(maxBuy, msg.sender);
+    // }
     
     function adminCount() public view returns(uint256 admins) {
         return organization.getAdminCount();
@@ -64,7 +68,7 @@ contract ControlPanel {
     }
     
     function transfer(address to, uint256 amount) public returns(bool success) {
-        return organization.transfer(to, amount);
+        return organization.transferTo(to, amount, msg.sender);
     }
     
     function toggleSales() public returns(bool success, bool salesOpen){
@@ -89,12 +93,13 @@ contract ControlPanel {
         return organization.buyTokens(msg.sender, totalTokens);
     }
     
-    function acceptDonations() payable public {
-        // address(organization).transfer(msg.value);
+    function acceptDonations() payable public returns(string memory) {
+        (bool sent, ) = address(organization).call{value:msg.value}("");
+        require(sent, "Something went wrong");
+        return "Thank you for you generous donation";
     }
     
     function toggleDonations() public returns(bool success) {
         return organization.toggleDonations(msg.sender);
     }
-    
 }
